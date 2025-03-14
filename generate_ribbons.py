@@ -40,44 +40,66 @@ def generate_origins(n: int, initial_origin, top: bool, a=1.42):
             origins[2 + 2*i, :] = np.array([initial_origin[0],
                                             initial_origin[1],
                                             initial_origin[2] + 3*(i+1)*a])
-
-    print(origins)
     return origins
 
 
-def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
+def check_parameters(N: int, identifier, n: int, m, vac=5):
     if (identifier not in ['S', 'I']):
         raise ValueError("Identifier must be 'S' or 'I'")
     elif (N % 1 != 0):
         raise TypeError("N must be an integer")
-    elif (m < 2):
-        raise ValueError("m must be greater than 1")
-
-    # Bond lengths
-    # C_H = 1.09,
-    C_C = 1.42
-
+    elif (not (m >= 1)):
+        raise ValueError("m must be greater or equal to 1")
+    
     if (identifier == 'S'):
         if ((N % 2 == 0) and m % 1 == 0):
             raise ValueError("For N even m must be a half integer")
         elif ((N % 2 == 1) and m % 1 != 0):
             raise ValueError("For N odd m must be an integer")
-        elif (m % 1 != 0 or m % 1 != 0.5):
+        elif (m % 1 != 0 and m % 1 != 0.5):
             raise ValueError("m must be an integer or a half integer")
 
-        length = 2*(2*n+1)
+    if (identifier == 'I'):
         if (N % 2 == 0):
-            length += m-1.5
-        ribbon = graphene_nanoribbon(N/2.0, length,
-                                     type='armchair', vacuum=vac)
-        u_edge = max(ribbon.positions[:, 0])
-        l_edge = min(ribbon.positions[:, 0])
+            raise ValueError("For I type structure N must be odd")
+
+
+def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
+
+    check_parameters(N, identifier, n, m, vac)
+    # Bond lengths
+    # C_H = 1.09,
+    C_C = 1.42
+
+    if (identifier == 'S'):
+
+        length = (2*n+1)
+
+        if (N % 2 == 0):
+            length += 2*(m-1.5)
+            ribbon = graphene_nanoribbon(N/2.0, int(length),
+                                         type='armchair', vacuum=vac)
+
+            u_edge = max(ribbon.positions[:, 0])
+            l_edge = min(ribbon.positions[:, 0])
+
+            origins_top = generate_origins(n, [l_edge, vac, 0], top=False)
+            for o in origins_top:
+                C2_edge = add_C2(o, ribbon.cell, False)
+                ribbon += C2_edge
+
+            start_bottom = [u_edge, vac, (3/2 + 3*n + 3*(m-1.5))*C_C]
+            origins_bottom = generate_origins(n, start_bottom, top=True)
+            for o in origins_bottom:
+                C2_edge = add_C2(o, ribbon.cell, True)
+                ribbon += C2_edge
+
         print('S')
 
     if (identifier == 'I'):
 
         length = (n + 2) + (m - 3)
-        ribbon = graphene_nanoribbon(N/2.0, length,
+        ribbon = graphene_nanoribbon(N/2.0, int(length),
                                      type='armchair', vacuum=vac)
 
         u_edge = max(ribbon.positions[:, 0])
@@ -94,8 +116,10 @@ def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
             C2_edge = add_C2(o, ribbon.cell, False)
             ribbon += C2_edge
 
+    print(ribbon.cell)
+
     return ribbon
 
 
-ribbon = generate_ribbon(7, 'I', 3, 3)
+ribbon = generate_ribbon(7, 'S', 2, 1.5)
 view(ribbon)
