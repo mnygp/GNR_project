@@ -19,7 +19,33 @@ def add_C2(origin, cell, top: bool, a=1.42):
     return C2
 
 
-def generate_ribbon(N, identifier, n, m, vac=5, saturate=True):
+def generate_origins(n: int, initial_origin, top: bool, a=1.42):
+    origins = np.zeros((2*n + 1, 3))
+
+    origins[0, :] = initial_origin
+
+    if (top):
+        for i in range(n):
+            origins[1 + 2*i, :] = np.array([initial_origin[0] + np.sqrt(3)/2*a,
+                                            initial_origin[1],
+                                            initial_origin[2] + (1.5 + 3*i)*a])
+            origins[2 + 2*i, :] = np.array([initial_origin[0],
+                                            initial_origin[1],
+                                            initial_origin[2] + 3*(i+1)*a])
+    else:
+        for i in range(n):
+            origins[1 + 2*i, :] = np.array([initial_origin[0] - np.sqrt(3)/2*a,
+                                            initial_origin[1],
+                                            initial_origin[2] + (1.5 + 3*i)*a])
+            origins[2 + 2*i, :] = np.array([initial_origin[0],
+                                            initial_origin[1],
+                                            initial_origin[2] + 3*(i+1)*a])
+
+    print(origins)
+    return origins
+
+
+def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
     if (identifier not in ['S', 'I']):
         raise ValueError("Identifier must be 'S' or 'I'")
     elif (N % 1 != 0):
@@ -28,7 +54,7 @@ def generate_ribbon(N, identifier, n, m, vac=5, saturate=True):
         raise ValueError("m must be greater than 1")
 
     # Bond lengths
-    C_H = 1.09,
+    # C_H = 1.09,
     C_C = 1.42
 
     if (identifier == 'S'):
@@ -50,32 +76,26 @@ def generate_ribbon(N, identifier, n, m, vac=5, saturate=True):
 
     if (identifier == 'I'):
 
-        length = (2*n + 1) + (m - 3)
+        length = (n + 2) + (m - 3)
         ribbon = graphene_nanoribbon(N/2.0, length,
                                      type='armchair', vacuum=vac)
 
         u_edge = max(ribbon.positions[:, 0])
         l_edge = min(ribbon.positions[:, 0])
 
-        for i in range(n):
-            u_origin = [u_edge, vac, C_C*3/2]
-            C2_edge_u = add_C2(u_origin, ribbon.cell, True)
-            ribbon += C2_edge_u
+        origins_top = generate_origins(n, [u_edge, vac, C_C*3/2], top=True)
+        origins_bottom = generate_origins(n, [l_edge, vac, C_C*3/2], top=False)
 
-            l_origin = [l_edge, vac, C_C*3/2]
-            C2_edge_l = add_C2(l_origin, ribbon.cell, False)
-            ribbon += C2_edge_l
+        for o in origins_top:
+            C2_edge = add_C2(o, ribbon.cell, True)
+            ribbon += C2_edge
 
-
-
-    cell = [2*vac + (u_edge-l_edge), 2*vac, 3*C_C*length]
-
-    print(u_edge, l_edge)
-    print(ribbon.cell)
-    print(cell)
+        for o in origins_bottom:
+            C2_edge = add_C2(o, ribbon.cell, False)
+            ribbon += C2_edge
 
     return ribbon
 
 
-ribbon = generate_ribbon(7, 'I', 1, 5)
+ribbon = generate_ribbon(7, 'I', 3, 3)
 view(ribbon)
