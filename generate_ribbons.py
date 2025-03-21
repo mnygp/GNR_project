@@ -62,11 +62,18 @@ def check_parameters(N: int, identifier, n: int, m, vac=5):
             raise ValueError("For I type ribbons N must be odd")
 
 
+def saturate_edges(ribbon, top: bool, a=1.42):
+    C_H_bond = 1.09
+
+    C_pos = ribbon.positions
+
+
+
 def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
 
     check_parameters(N, identifier, n, m, vac)
     # Bond lengths
-    # C_H_bond = 1.09,
+
     C_C_bond = 1.42
 
     if (identifier == 'S'):
@@ -133,10 +140,12 @@ def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
             C2_edge = add_C2(o, ribbon.cell, False)
             ribbon += C2_edge
 
+    ribbon.positions[:, 2] = ribbon.positions[:, 2] % ribbon.cell[2, 2]
+
     print(ribbon.cell)
 
     return ribbon
 
 
-ribbon = generate_ribbon(8, 'S', 3, 1.3)  # (N, identifier, n, m)
+ribbon = generate_ribbon(7, 'S', 3, 2)  # (N, identifier, n, m)
 view(ribbon)
