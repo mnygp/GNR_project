@@ -15,7 +15,7 @@ def add_C2(origin, cell, top: bool, a=1.42):
         position1[0] -= np.sqrt(3)/2*a
         position2[0] -= np.sqrt(3)/2*a
 
-    C2 = Atoms('C2', positions=[position1, position2], cell=cell)
+    C2 = Atoms('C2', positions=[position1, position2], cell=cell, tags=[5, 5])
     return C2
 
 
@@ -68,8 +68,8 @@ def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
 
     check_parameters(N, identifier, n, m, vac)
     # Bond lengths
-    # C_H = 1.09,
-    C_C = 1.42
+    # C_H_bond = 1.09,
+    C_C_bond = 1.42
 
     if (identifier == 'S'):
 
@@ -80,21 +80,41 @@ def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
             ribbon = graphene_nanoribbon(N/2.0, int(length),
                                          type='armchair', vacuum=vac)
 
-            u_edge = max(ribbon.positions[:, 0])
-            l_edge = min(ribbon.positions[:, 0])
+            top_edge = max(ribbon.positions[:, 0])
+            bottom_edge = min(ribbon.positions[:, 0])
 
-            origins_top = generate_origins(n, [l_edge, vac, 0], top=False)
-            for o in origins_top:
+            origins_bottom = generate_origins(n, [bottom_edge, vac, 0],
+                                              top=False)
+            for o in origins_bottom:
                 C2_edge = add_C2(o, ribbon.cell, False)
                 ribbon += C2_edge
 
-            start_bottom = [u_edge, vac, (3/2 + 3*n + 3*(m-1.5))*C_C]
-            origins_bottom = generate_origins(n, start_bottom, top=True)
-            for o in origins_bottom:
+            start_top = [top_edge, vac, (3/2 + 3*n + 3*(m-1.5))*C_C_bond]
+            origins_top = generate_origins(n, start_top, top=True)
+            for o in origins_top:
                 C2_edge = add_C2(o, ribbon.cell, True)
                 ribbon += C2_edge
 
-        print('S')
+        elif (N % 2 == 1):
+            length += 2*(m-1)
+            ribbon = graphene_nanoribbon(N/2.0, int(length),
+                                         type='armchair', vacuum=vac)
+
+            top_edge = max(ribbon.positions[:, 0])
+            bottom_edge = min(ribbon.positions[:, 0])
+
+            origins_bottom = generate_origins(n,
+                                              [bottom_edge, vac, C_C_bond*3/2],
+                                              False)
+            for o in origins_bottom:
+                C2_edge = add_C2(o, ribbon.cell, False)
+                ribbon += C2_edge
+
+            start_top = [top_edge, vac, (3/2 + 3+3*n + 3*(m-2))*C_C_bond]
+            origins_top = generate_origins(n, start_top, top=True)
+            for o in origins_top:
+                C2_edge = add_C2(o, ribbon.cell, True)
+                ribbon += C2_edge
 
     if (identifier == 'I'):
 
@@ -102,16 +122,18 @@ def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
         ribbon = graphene_nanoribbon(N/2.0, int(length),
                                      type='armchair', vacuum=vac)
 
-        u_edge = max(ribbon.positions[:, 0])
-        l_edge = min(ribbon.positions[:, 0])
+        top_edge = max(ribbon.positions[:, 0])
+        bottom_edge = min(ribbon.positions[:, 0])
 
-        origins_top = generate_origins(n, [u_edge, vac, C_C*3/2], top=True)
-        origins_bottom = generate_origins(n, [l_edge, vac, C_C*3/2], top=False)
-
+        origins_top = generate_origins(n,
+                                       [top_edge, vac, C_C_bond*3/2],
+                                       top=True)
         for o in origins_top:
             C2_edge = add_C2(o, ribbon.cell, True)
             ribbon += C2_edge
 
+        origins_bottom = generate_origins(n, [bottom_edge, vac, C_C_bond*3/2],
+                                          top=False)
         for o in origins_bottom:
             C2_edge = add_C2(o, ribbon.cell, False)
             ribbon += C2_edge
@@ -121,5 +143,5 @@ def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
     return ribbon
 
 
-ribbon = generate_ribbon(7, 'S', 2, 1.5)
+ribbon = generate_ribbon(8, 'S', 4, 3.5)  # (N, identifier, n, m)
 view(ribbon)
