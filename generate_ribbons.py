@@ -62,9 +62,7 @@ def check_parameters(N: int, identifier, n: int, m, vac=5):
             raise ValueError("For I type ribbons N must be odd")
 
 
-def saturate_edges(ribbon):
-    C_H_bond = 1.09
-
+def saturate_edges(ribbon, atom_type='H', bond_len=1.09):
     C_pos = ribbon.positions
 
     max_C = max(C_pos[:, 2])
@@ -79,7 +77,7 @@ def saturate_edges(ribbon):
             direction = - (C_pos[closest[0]] - pos) - (C_pos[closest[1]] - pos)
             direction = direction / np.linalg.norm(direction)
 
-            ribbon += Atoms('H', positions=[pos + direction*C_H_bond],
+            ribbon += Atoms('H', positions=[pos + direction*bond_len],
                             cell=ribbon.cell)
         # Edge case
         if (np.sum(dist < 1.5) == 2):
@@ -89,7 +87,7 @@ def saturate_edges(ribbon):
             direction += [0, 0, 2*(C_pos[closest][2] - pos[2])]
             direction = direction / np.linalg.norm(direction)
 
-            ribbon += Atoms('H', positions=[pos + direction*C_H_bond],
+            ribbon += Atoms(atom_type, positions=[pos + direction*bond_len],
                             cell=ribbon.cell)
 
     # Remove excess H atoms
