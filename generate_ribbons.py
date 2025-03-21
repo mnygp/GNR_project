@@ -52,16 +52,14 @@ def check_parameters(N: int, identifier, n: int, m, vac=5):
         raise ValueError("m must be greater or equal to 1")
 
     if (identifier == 'S'):
-        if ((N % 2 == 0) and m % 1 == 0):
+        if ((N % 2 == 0) and (m % 1 != 0.5)):
             raise ValueError("For N even m must be a half integer")
-        elif ((N % 2 == 1) and m % 1 != 0):
+        elif ((N % 2 == 1) and (m % 1 != 0)):
             raise ValueError("For N odd m must be an integer")
-        elif (m % 1 != 0 and m % 1 != 0.5):
-            raise ValueError("m must be an integer or a half integer")
 
     if (identifier == 'I'):
         if (N % 2 == 0):
-            raise ValueError("For I type structure N must be odd")
+            raise ValueError("For I type ribbons N must be odd")
 
 
 def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
@@ -140,5 +138,5 @@ def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
     return ribbon
 
 
-ribbon = generate_ribbon(7, 'S', 3, 1)  # (N, identifier, n, m)
+ribbon = generate_ribbon(8, 'S', 3, 1.3)  # (N, identifier, n, m)
 view(ribbon)
