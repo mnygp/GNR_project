@@ -50,7 +50,7 @@ def check_parameters(N: int, identifier, n: int, m, vac=5):
         raise TypeError("N must be an integer")
     elif (not (m >= 1)):
         raise ValueError("m must be greater or equal to 1")
-    
+
     if (identifier == 'S'):
         if ((N % 2 == 0) and m % 1 == 0):
             raise ValueError("For N even m must be a half integer")
@@ -72,11 +72,8 @@ def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
     C_C_bond = 1.42
 
     if (identifier == 'S'):
-
-        length = (2*n+1)
-
         if (N % 2 == 0):
-            length += 2*(m-1.5)
+            length = (2*n + 1) + 2*(m-1.5)
             ribbon = graphene_nanoribbon(N/2.0, int(length),
                                          type='armchair', vacuum=vac)
 
@@ -96,7 +93,7 @@ def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
                 ribbon += C2_edge
 
         elif (N % 2 == 1):
-            length += 2*(m-1)
+            length = 2*(n+1) + 2*(m-2)
             ribbon = graphene_nanoribbon(N/2.0, int(length),
                                          type='armchair', vacuum=vac)
 
@@ -143,5 +140,5 @@ def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
     return ribbon
 
 
-ribbon = generate_ribbon(8, 'S', 4, 3.5)  # (N, identifier, n, m)
+ribbon = generate_ribbon(7, 'S', 3, 1)  # (N, identifier, n, m)
 view(ribbon)
