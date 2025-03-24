@@ -15,3 +15,18 @@ def relax_PW(structure, PW_cut, k_pts, filename, func='PBE'):
     relax.run(fmax=0.05)
 
     return structure
+
+
+def relax_LCAO(structure, k_pts, filename, func='PBE', basis='dzp'):
+    calc = GPAW(mode='lcao',
+                basis=basis,
+                xc=func,
+                kpts=(1, 1, k_pts),
+                txt=filename)
+
+    structure.set_calculator(calc)
+    uf = UnitCellFilter(structure)
+    relax = BFGS(uf)
+    relax.run(fmax=0.05)
+
+    return structure
