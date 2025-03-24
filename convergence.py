@@ -10,6 +10,7 @@ ribbon_saturated = saturate_edges(ribbon)
 
 energy_k = np.array([])
 energy_cut = np.array([])
+energy_vac = np.array([])
 
 for k in range(1, 11):
     calc = GPAW(mode=PW(350),
@@ -26,10 +27,22 @@ for k in range(1, 11):
 for cut in range(300, 601, 50):
     calc = GPAW(mode=PW(cut),
                 xc='PBE',
-                kpts=(1, 1, 6),
+                kpts=(1, 1, 8),
                 txt=folder + f'AGNR_S_3_1_cut{cut}.txt')
 
     ribbon_saturated.set_calculator(calc)
 
     energy = ribbon_saturated.get_potential_energy()
     energy_cut = np.append(energy_k, energy)
+
+for vac in range(1, 11):
+    ribbon_vac = saturate_edges(ribbon, vac=vac)
+    calc = GPAW(mode=PW(350),
+                xc='PBE',
+                kpts=(1, 1, 8),
+                txt=folder + f'AGNR_S_3_1_vac{vac}.txt')
+
+    ribbon_vac.set_calculator(calc)
+
+    energy = ribbon_vac.get_potential_energy()
+    energy_vac = np.append(energy_k, energy)
