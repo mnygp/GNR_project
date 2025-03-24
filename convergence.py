@@ -20,36 +20,39 @@ for k in range(1, 11):
     calc = GPAW(mode=PW(350),
                 xc='PBE',
                 kpts=(1, 1, k),
-                txt=folder + f'AGNR_S_3_1_k{k}.txt')
+                txt=folder + f'AGNR_3_S_1_1_k{k}.txt')
 
     ribbon_saturated.set_calculator(calc)
 
     energy = ribbon_saturated.get_potential_energy()
     energy_k = np.append(energy_k, energy)
+    parprint(f"k-points {k} done")
 
 
 for cut in range(200, 601, 40):
     calc = GPAW(mode=PW(cut),
                 xc='PBE',
                 kpts=(1, 1, 8),
-                txt=folder + f'AGNR_S_3_1_cut{cut}.txt')
+                txt=folder + f'AGNR_3_S_1_1_cut{cut}.txt')
 
     ribbon_saturated.set_calculator(calc)
 
     energy = ribbon_saturated.get_potential_energy()
     energy_cut = np.append(energy_k, energy)
+    parprint(f"Plane-wave cutoff {cut} done")
 
 for vac in range(1, 11):
     ribbon_vac = saturate_edges(ribbon, vac=vac)
     calc = GPAW(mode=PW(350),
                 xc='PBE',
                 kpts=(1, 1, 8),
-                txt=folder + f'AGNR_S_3_1_vac{vac}.txt')
+                txt=folder + f'AGNR_3_S_1_1_vac{vac}.txt')
 
     ribbon_vac.set_calculator(calc)
 
     energy = ribbon_vac.get_potential_energy()
     energy_vac = np.append(energy_k, energy)
+    parprint(f"Vacuum {vac}Å done")
 
 parprint("Convergence tests:")
 parprint("k-points 1 to 10")
