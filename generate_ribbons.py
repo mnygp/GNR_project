@@ -62,7 +62,7 @@ def check_parameters(N: int, identifier, n: int, m, vac=5):
             raise ValueError("For I type ribbons N must be odd")
 
 
-def saturate_edges(ribbon, atom_type='H', bond_len=1.09):
+def saturate_edges(ribbon, symbol='H', bond_len=1.09):
     C_pos = ribbon.positions
 
     max_C = max(C_pos[:, 2])
@@ -77,7 +77,7 @@ def saturate_edges(ribbon, atom_type='H', bond_len=1.09):
             direction = - (C_pos[closest[0]] - pos) - (C_pos[closest[1]] - pos)
             direction = direction / np.linalg.norm(direction)
 
-            ribbon += Atoms('H', positions=[pos + direction*bond_len],
+            ribbon += Atoms(symbol, positions=[pos + direction*bond_len],
                             cell=ribbon.cell)
         # Edge case
         if (np.sum(dist < 1.5) == 2):
@@ -87,7 +87,7 @@ def saturate_edges(ribbon, atom_type='H', bond_len=1.09):
             direction += [0, 0, 2*(C_pos[closest][2] - pos[2])]
             direction = direction / np.linalg.norm(direction)
 
-            ribbon += Atoms(atom_type, positions=[pos + direction*bond_len],
+            ribbon += Atoms(symbol, positions=[pos + direction*bond_len],
                             cell=ribbon.cell)
 
     # Remove excess H atoms
@@ -97,7 +97,7 @@ def saturate_edges(ribbon, atom_type='H', bond_len=1.09):
     return ribbon
 
 
-def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
+def generate_ribbon(N: int, identifier: str, n: int, m, vac=5):
 
     check_parameters(N, identifier, n, m, vac)
     # Bond lengths
@@ -169,9 +169,11 @@ def generate_ribbon(N: int, identifier, n: int, m, vac=5, saturate=True):
             ribbon += C2_edge
 
     ribbon.positions[:, 2] = ribbon.positions[:, 2] % ribbon.cell[2, 2]
+    ribbon.center(vac, axis=0)
 
     return ribbon
 
 
-ribbon = generate_ribbon(7, 'S', 3, 2)  # (N, identifier, n, m)
+ribbon = generate_ribbon(3, 'S', 1, 1)  # (N, identifier, n, m)
+ribbon = saturate_edges(ribbon)  # (atoms, symbol, bond length)
 view(ribbon)
