@@ -1,4 +1,4 @@
-from generate_ribbons import generate_ribbon, saturate_edges
+import functions.generate_ribbons as gr
 
 from gpaw import GPAW, PW
 from ase.parallel import parprint
@@ -9,8 +9,8 @@ from matplotlib import pyplot as plt
 folder = "convergence_files/"
 
 # Create a 3-AGNR with 2 saturated edges on each side
-ribbon = generate_ribbon(3, 'S', 1, 1)
-ribbon_saturated = saturate_edges(ribbon)
+ribbon = gr.generate_ribbon(3, 'S', 1, 1)
+ribbon_saturated = gr.saturate_edges(ribbon)
 
 energy_k = np.array([])
 energy_cut = np.array([])
@@ -42,7 +42,7 @@ for cut in range(200, 601, 40):
     parprint(f"Plane-wave cutoff {cut} done")
 
 for vac in range(1, 11):
-    ribbon_vac = saturate_edges(ribbon, vac=vac)
+    ribbon_vac = gr.saturate_edges(ribbon, vac=vac)
     calc = GPAW(mode=PW(350),
                 xc='PBE',
                 kpts=(1, 1, 8),
