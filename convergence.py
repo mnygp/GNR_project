@@ -9,14 +9,14 @@ import functions.generate_ribbons as gr
 folder = "convergence_files/"
 
 # Create a 3-AGNR with 2 saturated edges on each side
-ribbon = gr.generate_ribbon(3, 'S', 1, 1)
-ribbon_saturated = gr.saturate_edges(ribbon)
 
 energy_k = np.array([])
 energy_cut = np.array([])
 energy_vac = np.array([])
 
 for k in range(1, 11):
+    ribbon = gr.generate_ribbon(3, 'S', 1, 1)
+    ribbon_saturated = gr.saturate_edges(ribbon)
     calc = GPAW(mode=PW(350),
                 xc='PBE',
                 kpts=(1, 1, k),
@@ -30,6 +30,8 @@ for k in range(1, 11):
 
 
 for cut in range(200, 601, 40):
+    ribbon = gr.generate_ribbon(3, 'S', 1, 1)
+    ribbon_saturated = gr.saturate_edges(ribbon)
     calc = GPAW(mode=PW(cut),
                 xc='PBE',
                 kpts=(1, 1, 8),
@@ -42,7 +44,8 @@ for cut in range(200, 601, 40):
     parprint(f"Plane-wave cutoff {cut} done")
 
 for vac in range(1, 11):
-    ribbon_vac = gr.saturate_edges(ribbon)
+    ribbon = gr.generate_ribbon(3, 'S', 1, 1)
+    ribbon_saturated = gr.saturate_edges(ribbon)
     calc = GPAW(mode=PW(350),
                 xc='PBE',
                 kpts=(1, 1, 8),
@@ -50,7 +53,7 @@ for vac in range(1, 11):
 
     ribbon_saturated.calc = calc
 
-    energy = ribbon_vac.get_potential_energy()
+    energy = ribbon.get_potential_energy()
     energy_vac = np.append(energy_k, energy)
     parprint(f"Vacuum {vac}Å done")
 
