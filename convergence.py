@@ -40,7 +40,7 @@ for cut in range(200, 601, 40):
     ribbon_saturated.calc = calc
 
     energy = ribbon_saturated.get_potential_energy()
-    energy_cut = np.append(energy_k, energy)
+    energy_cut = np.append(energy_cut, energy)
     parprint(f"Plane-wave cutoff {cut} done")
 
 for vac in range(1, 11):
@@ -54,7 +54,7 @@ for vac in range(1, 11):
     ribbon_saturated.calc = calc
 
     energy = ribbon.get_potential_energy()
-    energy_vac = np.append(energy_k, energy)
+    energy_vac = np.append(energy_vac, energy)
     parprint(f"Vacuum {vac}Å done")
 
 parprint("Convergence tests:")
@@ -71,6 +71,7 @@ ax_k.plot(range(1, 11), energy_k, 'o-')
 ax_k.set_xlabel('k-points')
 ax_k.set_ylabel('Energy (eV)')
 ax_k.set_title('Convergence with k-points')
+ax_k.grid()
 fig_k.savefig(folder + 'AGNR_S_3_1_k.png')
 
 fig_cut, ax_cut = plt.subplots()
@@ -78,6 +79,7 @@ ax_cut.plot(range(200, 601, 40), energy_cut, 'o-')
 ax_cut.set_xlabel('Plane-wave cutoff (eV)')
 ax_cut.set_ylabel('Energy (eV)')
 ax_cut.set_title('Convergence with plane-wave cutoff')
+ax_cut.grid()
 fig_cut.savefig(folder + 'AGNR_S_3_1_cut.png')
 
 fig_vac, ax_vac = plt.subplots()
@@ -85,4 +87,5 @@ ax_vac.plot(range(1, 11), energy_vac, 'o-')
 ax_vac.set_xlabel('Vacuum (Å)')
 ax_vac.set_ylabel('Energy (eV)')
 ax_vac.set_title('Convergence with vacuum')
+ax_vac.grid()
 fig_vac.savefig(folder + 'AGNR_S_3_1_vac.png')
