@@ -1,10 +1,10 @@
-import functions.generate_ribbons as gr
-
-from gpaw import GPAW, PW
-from ase.parallel import parprint
-
 import numpy as np
 from matplotlib import pyplot as plt
+from gpaw import GPAW, PW
+from ase.parallel import parprint
+import sys
+sys.path.append('.')
+import functions.generate_ribbons as gr
 
 folder = "convergence_files/"
 
@@ -22,7 +22,7 @@ for k in range(1, 11):
                 kpts=(1, 1, k),
                 txt=folder + f'AGNR_3_S_1_1_k{k}.txt')
 
-    ribbon_saturated.set_calculator(calc)
+    ribbon_saturated.calc = calc
 
     energy = ribbon_saturated.get_potential_energy()
     energy_k = np.append(energy_k, energy)
@@ -35,20 +35,20 @@ for cut in range(200, 601, 40):
                 kpts=(1, 1, 8),
                 txt=folder + f'AGNR_3_S_1_1_cut{cut}.txt')
 
-    ribbon_saturated.set_calculator(calc)
+    ribbon_saturated.calc = calc
 
     energy = ribbon_saturated.get_potential_energy()
     energy_cut = np.append(energy_k, energy)
     parprint(f"Plane-wave cutoff {cut} done")
 
 for vac in range(1, 11):
-    ribbon_vac = gr.saturate_edges(ribbon, vac=vac)
+    ribbon_vac = gr.saturate_edges(ribbon)
     calc = GPAW(mode=PW(350),
                 xc='PBE',
                 kpts=(1, 1, 8),
                 txt=folder + f'AGNR_3_S_1_1_vac{vac}.txt')
 
-    ribbon_vac.set_calculator(calc)
+    ribbon_saturated.calc = calc
 
     energy = ribbon_vac.get_potential_energy()
     energy_vac = np.append(energy_k, energy)
