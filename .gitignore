@@ -1,1 +1,4 @@
 __pycache__/
+convergence_files/
+*.err
+*.out
