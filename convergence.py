@@ -43,8 +43,8 @@ for cut in range(200, 601, 40):
     energy_cut = np.append(energy_cut, energy)
     parprint(f"Plane-wave cutoff {cut} done")
 
-for vac in range(1, 11):
-    ribbon = gr.generate_ribbon(3, 'S', 1, 1)
+for vac in range(1, 15):
+    ribbon = gr.generate_ribbon(3, 'S', 1, 1, vac=vac)
     ribbon_saturated = gr.saturate_edges(ribbon)
     calc = GPAW(mode=PW(350),
                 xc='PBE',
@@ -83,7 +83,7 @@ ax_cut.grid()
 fig_cut.savefig(folder + 'AGNR_S_3_1_cut.png')
 
 fig_vac, ax_vac = plt.subplots()
-ax_vac.plot(range(1, 11), energy_vac, 'o-')
+ax_vac.plot(range(1, 15), energy_vac, 'o-')
 ax_vac.set_xlabel('Vacuum (Å)')
 ax_vac.set_ylabel('Energy (eV)')
 ax_vac.set_title('Convergence with vacuum')
