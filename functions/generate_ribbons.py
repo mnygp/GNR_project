@@ -90,7 +90,7 @@ def saturate_edges(ribbon, symbol='H', bond_len=1.09):
             ribbon += Atoms(symbol, positions=[pos + direction*bond_len],
                             cell=ribbon.cell)
 
-    # Remove excess H atoms
+    # Remove excess H atoms at the periodic edges
     del ribbon[[atom.index for atom in ribbon if atom.position[2] < 0]]
     del ribbon[[atom.index for atom in ribbon if atom.position[2] > max_C]]
 
@@ -100,8 +100,7 @@ def saturate_edges(ribbon, symbol='H', bond_len=1.09):
 def generate_ribbon(N: int, identifier: str, n: int, m, vac=5):
 
     check_parameters(N, identifier, n, m, vac)
-    # Bond lengths
-
+    # Bond length
     C_C_bond = 1.42
 
     if (identifier == 'S'):
