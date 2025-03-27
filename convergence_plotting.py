@@ -5,7 +5,7 @@ plt.style.use('science')
 
 plt.rcParams['axes.grid'] = True
 
-folder = "convergence_files/"
+folder = "plots/"
 
 k = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 e_k = [-240.0759277,  -241.8743619,  -241.64488299, -241.71911204,
@@ -30,7 +30,7 @@ ax_k.plot(range(1, 11), e_k, 'o-')
 ax_k.set_xlabel('k-points')
 ax_k.set_ylabel('Energy (eV)')
 ax_k.set_title('Convergence with k-points')
-fig_k.savefig(folder + 'AGNR_S_3_1_k.png', dpi=500)
+fig_k.savefig(folder + 'AGNR_S_3_1_k_conv.png', dpi=500)
 
 fig_cut, ax_cut = plt.subplots()
 fig_cut.set_size_inches(6, 4)
@@ -38,7 +38,7 @@ ax_cut.plot(range(200, 601, 40), e_cut, 'o-')
 ax_cut.set_xlabel('Plane-wave cutoff (eV)')
 ax_cut.set_ylabel('Energy (eV)')
 ax_cut.set_title('Convergence with plane-wave cutoff')
-fig_cut.savefig(folder + 'AGNR_S_3_1_cut.png', dpi=500)
+fig_cut.savefig(folder + 'AGNR_S_3_1_cut_conv.png', dpi=500)
 
 fig_vac, ax_vac = plt.subplots()
 fig_vac.set_size_inches(6, 4)
@@ -46,4 +46,4 @@ ax_vac.plot(range(1, 15), e_vac, 'o-')
 ax_vac.set_xlabel('Vacuum (Å)')
 ax_vac.set_ylabel('Energy (eV)')
 ax_vac.set_title('Convergence with vacuum')
-fig_vac.savefig(folder + 'AGNR_S_3_1_vac.png', dpi=500)
+fig_vac.savefig(folder + 'AGNR_S_3_1_vac_conv.png', dpi=500)
