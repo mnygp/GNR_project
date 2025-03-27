@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 
-# print(plt.rcParams['font.sans-serif'])
-# plt.rcParams['font.sans-serif'] = ['Computer Modern Sans Serif']
+import scienceplots
+plt.style.use('science')
+
+plt.rcParams['axes.grid'] = True
 
 folder = "convergence_files/"
 
@@ -23,28 +25,25 @@ e_vac = [-162.73828827, -235.26808402, -241.42616613, -241.69990325,
 
 
 fig_k, ax_k = plt.subplots()
+fig_k.set_size_inches(6, 4)
 ax_k.plot(range(1, 11), e_k, 'o-')
 ax_k.set_xlabel('k-points')
 ax_k.set_ylabel('Energy (eV)')
 ax_k.set_title('Convergence with k-points')
-ax_k.grid()
-fig_k.tight_layout()
-fig_k.savefig(folder + 'AGNR_S_3_1_k.png')
+fig_k.savefig(folder + 'AGNR_S_3_1_k.png', dpi=500)
 
 fig_cut, ax_cut = plt.subplots()
+fig_cut.set_size_inches(6, 4)
 ax_cut.plot(range(200, 601, 40), e_cut, 'o-')
 ax_cut.set_xlabel('Plane-wave cutoff (eV)')
 ax_cut.set_ylabel('Energy (eV)')
 ax_cut.set_title('Convergence with plane-wave cutoff')
-ax_cut.grid()
-fig_cut.tight_layout()
-fig_cut.savefig(folder + 'AGNR_S_3_1_cut.png')
+fig_cut.savefig(folder + 'AGNR_S_3_1_cut.png', dpi=500)
 
 fig_vac, ax_vac = plt.subplots()
+fig_vac.set_size_inches(6, 4)
 ax_vac.plot(range(1, 15), e_vac, 'o-')
 ax_vac.set_xlabel('Vacuum (Å)')
 ax_vac.set_ylabel('Energy (eV)')
 ax_vac.set_title('Convergence with vacuum')
-ax_vac.grid()
-fig_vac.tight_layout()
-fig_vac.savefig(folder + 'AGNR_S_3_1_vac.png')
+fig_vac.savefig(folder + 'AGNR_S_3_1_vac.png', dpi=500)
