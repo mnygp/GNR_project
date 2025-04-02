@@ -1,9 +1,6 @@
 import numpy as np
-from matplotlib import pyplot as plt
 from gpaw import GPAW, PW
 from ase.parallel import parprint
-import sys
-sys.path.append('.')
 import functions.generate_ribbons as gr
 
 folder = "convergence_files/"
