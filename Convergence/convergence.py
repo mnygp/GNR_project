@@ -13,6 +13,7 @@ energy_vac = np.array([])
 
 for k in range(1, 11):
     ribbon = gr.generate_ribbon(3, 'S', 1, 1)
+    n_atoms = len(ribbon.positions)
     ribbon_saturated = gr.saturate_edges(ribbon)
     calc = GPAW(mode=PW(350),
                 xc='PBE',
@@ -22,12 +23,13 @@ for k in range(1, 11):
     ribbon_saturated.calc = calc
 
     energy = ribbon_saturated.get_potential_energy()
-    energy_k = np.append(energy_k, energy)
+    energy_k = np.append(energy_k, energy/n_atoms)
     parprint(f"k-points {k} done")
 
 
 for cut in range(200, 601, 40):
     ribbon = gr.generate_ribbon(3, 'S', 1, 1)
+    n_atoms = len(ribbon.positions)
     ribbon_saturated = gr.saturate_edges(ribbon)
     calc = GPAW(mode=PW(cut),
                 xc='PBE',
@@ -37,11 +39,12 @@ for cut in range(200, 601, 40):
     ribbon_saturated.calc = calc
 
     energy = ribbon_saturated.get_potential_energy()
-    energy_cut = np.append(energy_cut, energy)
+    energy_cut = np.append(energy_cut, energy/n_atoms)
     parprint(f"Plane-wave cutoff {cut} done")
 
-for vac in range(1, 15):
+for vac in range(2, 15):
     ribbon = gr.generate_ribbon(3, 'S', 1, 1, vac=vac)
+    n_atoms = len(ribbon.positions)
     ribbon_saturated = gr.saturate_edges(ribbon)
     calc = GPAW(mode=PW(350),
                 xc='PBE',
@@ -51,7 +54,7 @@ for vac in range(1, 15):
     ribbon_saturated.calc = calc
 
     energy = ribbon.get_potential_energy()
-    energy_vac = np.append(energy_vac, energy)
+    energy_vac = np.append(energy_vac, energy/n_atoms)
     parprint(f"Vacuum {vac}Å done")
 
 parprint("Convergence tests:")
