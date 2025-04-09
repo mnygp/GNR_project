@@ -7,10 +7,10 @@ convergence_criterion = 0.01
 
 folder = "convergence_files/"
 
-k_arr = np.array([])
-energy_k = np.array([])
 cut_arr = np.array([])
 energy_cut = np.array([])
+k_arr = np.array([])
+energy_k = np.array([])
 vac_arr = np.array([])
 energy_vac = np.array([])
 
@@ -34,14 +34,12 @@ while diff > convergence_criterion:
     cut_arr = np.append(cut_arr, cut)
     energy_cut = np.append(energy_cut, energy/n_atoms)
 
-    parprint(f"Plane-wave cutoff {cut} with energy={energy/n_atoms:.3f}")
-    parprint(f"All energies: {energy_cut}")
-
     if len(energy_cut) > 1:
         diff = abs(energy_cut[-1] - energy_cut[-2])
 
     cut += 40
-    parprint(f"Plane-wave cutoff {cut} done with diff={diff:.3f}")
+    parprint(f"Plane-wave cutoff {cut} with energy={energy/n_atoms:.3f}" +
+             f"and diff={diff:.3f}")
 
 if np.isnan(energy_cut[-1]) or energy_cut[-1] <= 0:
     raise ValueError("Invalid energy_cut value: {}".format(energy_cut[-1]))
@@ -54,7 +52,7 @@ while diff > convergence_criterion:
     n_atoms = len(ribbon.positions)
     ribbon_saturated = gr.saturate_edges(ribbon)
 
-    calc = GPAW(mode=PW(energy_cut[-1]),
+    calc = GPAW(mode=PW(cut_arr[-1]),
                 xc='PBE',
                 kpts=(1, 1, k),
                 txt=folder + f'AGNR_3_S_1_1_k{k}.txt')
@@ -65,19 +63,17 @@ while diff > convergence_criterion:
     k_arr = np.append(k_arr, k)
     energy_k = np.append(energy_k, energy/n_atoms)
 
-    parprint(f"k-points {k} with energy={energy/n_atoms:.3f}")
-    parprint(f"All energies: {energy_k}")
-
     if len(energy_k) > 1:
         diff = abs(energy_k[-1] - energy_k[-2])
 
     k += 1
-    parprint(f"k-points {k} done with diff={diff:.3f}")
+    parprint(f"k-points {k} with energy={energy/n_atoms:.3f}" +
+             f"and diff={diff:.3f}")
 
 if np.isnan(energy_k[-1]) or energy_k[-1] <= 0:
     raise ValueError("Invalid k-value value: {}".format(energy_k[-1]))
 
-vac = 2
+vac = 3
 diff = 200
 while diff > convergence_criterion:
 
@@ -85,7 +81,7 @@ while diff > convergence_criterion:
     n_atoms = len(ribbon.positions)
     ribbon_saturated = gr.saturate_edges(ribbon)
 
-    calc = GPAW(mode=PW(energy_cut[-1]),
+    calc = GPAW(mode=PW(cut_arr[-1]),
                 xc='PBE',
                 kpts=(1, 1, k_arr[-1]),
                 txt=folder + f'AGNR_3_S_1_1_vac{vac}.txt')
@@ -96,14 +92,12 @@ while diff > convergence_criterion:
     vac_arr = np.append(vac_arr, vac)
     energy_vac = np.append(energy_vac, energy/n_atoms)
 
-    parprint(f"Vacuum {vac} with energy={energy/n_atoms:.3f}")
-    parprint(f"All energies: {energy_vac}")
-
     if len(energy_vac) > 1:
         diff = abs(energy_vac[-1] - energy_vac[-2])
 
-    vac += 2
-    parprint(f"Vacuum {vac}Å done with diff={diff:.3f}")
+    vac += 1
+    parprint(f"Vacuum {vac}Å with energy={energy/n_atoms:.3f}" +
+             f"and diff={diff:.3f}")
 
 
 parprint("Convergence tests:")
