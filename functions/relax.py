@@ -4,39 +4,10 @@ from gpaw import GPAW, PW
 from ase import Atoms
 
 
-def relax_PW(structure, filename, PW_cut=600, k_pts=6, func='PBE'):
-    calc = GPAW(mode=PW(PW_cut),
-                xc=func,
-                kpts=(1, 1, k_pts),
-                txt=filename)
-
-    structure.set_calculator(calc)
-    uf = UnitCellFilter(structure)
-    relax = BFGS(uf)
-    relax.run(fmax=0.01)
-
-    return structure
-
-
-def relax_LCAO(structure, filename, k_pts=6, func='PBE', basis='dzp'):
-    calc = GPAW(mode='lcao',
-                basis=basis,
-                xc=func,
-                kpts=(1, 1, k_pts),
-                txt=filename)
-
-    structure.set_calculator(calc)
-    uf = UnitCellFilter(structure)
-    relax = BFGS(uf)
-    relax.run(fmax=0.01)
-
-    return structure
-
-
-def relax(structure: Atoms, filename: str, PW: bool,
-          params: dict[str], k: int = 6) -> Atoms:
+def relax(structure: Atoms, filename: str, PW_toggle: bool,
+          params: dict[str, str | float], k: int = 6) -> Atoms:
     func = params['func']
-    if PW:
+    if PW_toggle:
         PW_cut = params['PW_cut']
         calc = GPAW(mode=PW(PW_cut),
                     xc=func,
@@ -58,12 +29,10 @@ def relax(structure: Atoms, filename: str, PW: bool,
     return structure
 
 
-def multi_step_relax(structure: Atoms, filename: str, PW: bool,
-                     params: dict[str], k: int = 6) -> Atoms:
+def multi_step_relax(structure: Atoms, filename: str, PW_toggle: bool,
+                     params: dict[str], k_arr: list[int]) -> Atoms:
 
-    inital_k = int(k/2)
-    first_pass = relax(structure, filename+"1", PW, params, inital_k)
+    for k in k_arr:
+        structure = relax(structure, filename+f"_k_{k}", PW_toggle, params, k)
 
-    second_pass = relax(first_pass, filename+"2", PW, params, k)
-
-    return second_pass
+    return structure
