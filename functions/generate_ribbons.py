@@ -4,7 +4,7 @@ from ase import Atoms
 import numpy as np
 
 
-def add_C2(origin, cell, top: bool, a=1.42):
+def add_C2(origin: list[float], cell: list[float], top: bool, a=1.42) -> Atoms:
     position1 = [origin[0], origin[1], origin[2] + 0.5*a]
     position2 = [origin[0], origin[1], origin[2] + 1.5*a]
 
@@ -19,7 +19,8 @@ def add_C2(origin, cell, top: bool, a=1.42):
     return C2
 
 
-def generate_origins(n: int, initial_origin, top: bool, a=1.42):
+def generate_origins(n: int, initial_origin: list[float],
+                     top: bool, a=1.42) -> Atoms:
     origins = np.zeros((2*n + 1, 3))
 
     origins[0, :] = initial_origin
@@ -43,7 +44,7 @@ def generate_origins(n: int, initial_origin, top: bool, a=1.42):
     return origins
 
 
-def check_parameters(N: int, identifier, n: int, m, vac=5):
+def check_parameters(N: int, identifier: str, n: int, m, vac: float = 5):
     if (identifier not in ['S', 'I']):
         raise ValueError("Identifier must be 'S' or 'I'")
     elif (N % 1 != 0):
@@ -62,7 +63,8 @@ def check_parameters(N: int, identifier, n: int, m, vac=5):
             raise ValueError("For I type ribbons N must be odd")
 
 
-def saturate_edges(ribbon, symbol='H', bond_len=1.09):
+def saturate_edges(ribbon: Atoms, symbol: str = 'H',
+                   bond_len: float = 1.09) -> Atoms:
     C_pos = ribbon.positions
 
     max_C = max(C_pos[:, 2])
@@ -97,7 +99,7 @@ def saturate_edges(ribbon, symbol='H', bond_len=1.09):
     return ribbon
 
 
-def generate_ribbon(N: int, identifier: str, n: int, m, vac=5):
+def generate_ribbon(N: int, identifier: str, n: int, m: float, vac: float = 5):
 
     check_parameters(N, identifier, n, m, vac)
     # Bond length
