@@ -83,7 +83,7 @@ while diff > convergence_criterion:
 
     calc = GPAW(mode=PW(cut_arr[-1]),
                 xc='PBE',
-                kpts=(1, 1, k_arr[-1]),
+                kpts=(1, 1, int(k_arr[-1])),
                 txt=folder + f'AGNR_3_S_1_1_vac{vac}.txt')
 
     ribbon_saturated.calc = calc
