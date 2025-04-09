@@ -34,11 +34,17 @@ while diff > convergence_criterion:
     cut_arr = np.append(cut_arr, cut)
     energy_cut = np.append(energy_cut, energy/n_atoms)
 
+    parprint(f"Plane-wave cutoff {cut} with energy={energy/n_atoms:.3f}")
+    parprint(f"All energies: {energy_cut}")
+
     if len(energy_cut) > 1:
         diff = abs(energy_cut[-1] - energy_cut[-2])
 
     cut += 40
     parprint(f"Plane-wave cutoff {cut} done with diff={diff:.3f}")
+
+if np.isnan(energy_cut[-1]) or energy_cut[-1] <= 0:
+    raise ValueError("Invalid energy_cut value: {}".format(energy_cut[-1]))
 
 k = 1
 diff = 200
@@ -59,11 +65,17 @@ while diff > convergence_criterion:
     k_arr = np.append(k_arr, k)
     energy_k = np.append(energy_k, energy/n_atoms)
 
+    parprint(f"k-points {k} with energy={energy/n_atoms:.3f}")
+    parprint(f"All energies: {energy_k}")
+
     if len(energy_k) > 1:
         diff = abs(energy_k[-1] - energy_k[-2])
 
     k += 1
     parprint(f"k-points {k} done with diff={diff:.3f}")
+
+if np.isnan(energy_k[-1]) or energy_k[-1] <= 0:
+    raise ValueError("Invalid k-value value: {}".format(energy_k[-1]))
 
 vac = 2
 diff = 200
@@ -83,6 +95,10 @@ while diff > convergence_criterion:
 
     vac_arr = np.append(vac_arr, vac)
     energy_vac = np.append(energy_vac, energy/n_atoms)
+
+    parprint(f"Vacuum {vac} with energy={energy/n_atoms:.3f}")
+    parprint(f"All energies: {energy_vac}")
+
     if len(energy_vac) > 1:
         diff = abs(energy_vac[-1] - energy_vac[-2])
 
