@@ -39,10 +39,10 @@ while diff > convergence_criterion:
 
     cut += 40
     parprint(f"Plane-wave cutoff {cut} with energy={energy/n_atoms:.3f}" +
-             f"and diff={diff:.3f}")
+             f" and diff={diff:.3f}")
 
-if np.isnan(energy_cut[-1]) or energy_cut[-1] <= 0:
-    raise ValueError("Invalid energy_cut value: {}".format(energy_cut[-1]))
+if np.isnan(cut_arr[-1]) or cut_arr[-1] <= 0:
+    raise ValueError(f"Invalid energy_cut value: {cut_arr[-1]}")
 
 k = 1
 diff = 200
@@ -68,10 +68,10 @@ while diff > convergence_criterion:
 
     k += 1
     parprint(f"k-points {k} with energy={energy/n_atoms:.3f}" +
-             f"and diff={diff:.3f}")
+             f" and diff={diff:.3f}")
 
-if np.isnan(energy_k[-1]) or energy_k[-1] <= 0:
-    raise ValueError("Invalid k-value value: {}".format(energy_k[-1]))
+if np.isnan(k_arr[-1]) or (k_arr[-1] % 1) != 0:
+    raise ValueError(f"Invalid k-value value: {k_arr[-1]}")
 
 vac = 3
 diff = 200
@@ -97,7 +97,7 @@ while diff > convergence_criterion:
 
     vac += 1
     parprint(f"Vacuum {vac}Å with energy={energy/n_atoms:.3f}" +
-             f"and diff={diff:.3f}")
+             f" and diff={diff:.3f}")
 
 
 parprint("Convergence tests:")
