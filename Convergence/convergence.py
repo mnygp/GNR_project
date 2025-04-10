@@ -25,7 +25,7 @@ while diff > convergence_criterion:
 
     calc = GPAW(mode=PW(cut),
                 xc='PBE',
-                kpts=(1, 1, 8),
+                kpts={'size': (1, 1, 8)},
                 txt=folder + f'AGNR_3_S_1_1_cut{cut}.txt')
 
     ribbon_saturated.calc = calc
@@ -54,7 +54,7 @@ while diff > convergence_criterion:
 
     calc = GPAW(mode=PW(cut_arr[-1]),
                 xc='PBE',
-                kpts=(1, 1, k),
+                kpts={'size': (1, 1, 8)},
                 txt=folder + f'AGNR_3_S_1_1_k{k}.txt')
 
     ribbon_saturated.calc = calc
@@ -83,7 +83,7 @@ while diff > convergence_criterion:
 
     calc = GPAW(mode=PW(cut_arr[-1]),
                 xc='PBE',
-                kpts=(1, 1, int(k_arr[-1])),
+                kpts={'size': (1, 1, int(k_arr[-1]))},
                 txt=folder + f'AGNR_3_S_1_1_vac{vac}.txt')
 
     ribbon_saturated.calc = calc
