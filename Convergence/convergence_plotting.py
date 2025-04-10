@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-import scienceplots
+import scienceplots  # noqa: F401
 plt.style.use('science')
 
 plt.rcParams['axes.grid'] = True

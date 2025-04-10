@@ -110,7 +110,3 @@ parprint(energy_cut)
 parprint("Vacuum 2Å to 14Å")
 parprint(vac_arr)
 parprint(energy_vac)
-
-
-
-
