@@ -6,6 +6,7 @@ from ase.io import write, read
 from pathlib import Path
 
 from functions.relax import relax
+from functions.bandstructure import get_gap
 
 
 # This is a taskblaster workflow that generates a series of workflows for
@@ -31,6 +32,10 @@ class SubWorkflow:
         return tb.node('relax_ribbon', in_file=self.generate_ribbon_task,
                        out_file=f'relaxed_ribbon_{self.width}.xyz')
 
+    @tb.task
+    def calculate_gap_task(self):
+        return tb.node('calculate_gap_task', in_file=self.relax_ribbon_task)
+
 
 def generate_ribbon(width) -> Path:
     ribbon = graphene_nanoribbon(n=width/2.0, m=2, type='armchair',
@@ -47,7 +52,8 @@ def relax_ribbon(in_file: Path, out_file: str) -> Path:
     return Path(out_file)
 
 
-def calculate_gap_task(number):
-    # Placeholder for gap calculation logic
-    print(f'Gap {number} calculated')
-    return number
+def calculate_gap_task(in_file: Path) -> float:
+    ribbon = read(in_file)
+    gap = get_gap(ribbon, params={'func': 'PBE', 'PW_cut': 600}, k=6,
+                  filename='gap.txt')
+    return gap
