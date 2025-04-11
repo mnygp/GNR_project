@@ -31,18 +31,22 @@ class SubWorkflow:
         return tb.node('generate_ribbon', width=self.width)
 
     @tb.task
+    def gap_pre_relaxation_task(self):
+        return tb.node('calculate_gap', in_file=self.generate_ribbon_task)
+
+    @tb.task
     def relax_ribbon_task(self):
         return tb.node('relax_ribbon', in_file=self.generate_ribbon_task,
                        out_file=f'relaxed_ribbon_{self.width}.xyz')
 
     @tb.task
-    def calculate_gap_task(self):
-        return tb.node('calculate_gap_task', in_file=self.relax_ribbon_task)
+    def gap_post_relaxation_task(self):
+        return tb.node('calculate_gap', in_file=self.relax_ribbon_task)
 
     @tb.task
     def return_dict_task(self):
         return tb.node('return_dict', width=self.width,
-                       gap=self.calculate_gap_task)
+                       gap=self.calculate_gap)
 
 
 # The functions called in the tasks above are defined here.
@@ -61,26 +65,38 @@ def relax_ribbon(in_file: Path, out_file: str) -> Path:
     return Path(out_file)
 
 
-def calculate_gap_task(in_file: Path) -> float:
+def calculate_gap(in_file: Path) -> float:
     ribbon = read(in_file)
     gap = get_gap(ribbon, params={'func': 'PBE', 'PW_cut': 600}, k=6,
                   filename='gap.txt')
     return gap
 
 
-def return_dict(width, gap):
-    return {'width': width, 'gap': gap}
+def return_dict(width, pre_gap, post_gap) -> dict:
+    return {'width': width, 'pre_gap': pre_gap, 'post_gap': post_gap}
 
 
-def write_results_to_csv(results_gap):
-    rows = [
-        {"name": name, "width": int(name.split("_")[1]), "gap": gap}
-        for name, gap in results_gap.items()
-    ]
+def write_results_to_csv(results) -> Path:
+    rows = []
+    for name, d in results.items():
+        width = d['width']
+        pre_gap = d['pre_gap']
+        post_gap = d['post_gap']
+
+        rows.append({
+            "name": name,
+            "width": width,
+            "pre_relax_gap": pre_gap,
+            "post_relax_gap": post_gap,
+        })
+
     csv_path = Path("results.csv")
     with open(csv_path, mode="w", newline="") as csvfile:
         writer = csv.DictWriter(csvfile,
-                                fieldnames=["name", "width", "gap"])
+                                fieldnames=["name",
+                                            "width",
+                                            "pre_relax_gap",
+                                            "post_relax_gap"])
         writer.writeheader()
         writer.writerows(rows)
 
