@@ -4,6 +4,7 @@ from ase.build import graphene_nanoribbon
 from ase.io import write, read
 
 from pathlib import Path
+import csv
 
 from functions.relax import relax
 from functions.bandstructure import get_gap
@@ -69,3 +70,18 @@ def calculate_gap_task(in_file: Path) -> float:
 
 def return_dict(width, gap):
     return {'width': width, 'gap': gap}
+
+
+def write_results_to_csv(results_gap):
+    rows = [
+        {"name": name, "width": int(name.split("_")[1]), "gap": gap}
+        for name, gap in results_gap.items()
+    ]
+    csv_path = Path("results.csv")
+    with open(csv_path, mode="w", newline="") as csvfile:
+        writer = csv.DictWriter(csvfile,
+                                fieldnames=["name", "width", "gap"])
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return csv_path

@@ -1,6 +1,4 @@
 import taskblaster as tb
-from pathlib import Path
-import csv
 
 
 @tb.workflow
@@ -13,19 +11,9 @@ class Workflow:
         return tb.node('generate_wfs_from_list', input=self.max_width)
 
     @tb.task
-    def write_results_to_csv(self, results_gap):
-        rows = [
-            {"name": name, "width": int(name.split("_")[1]), "gap": gap}
-            for name, gap in results_gap.items()
-        ]
-        csv_path = Path("results.csv")
-        with open(csv_path, mode="w", newline="") as csvfile:
-            writer = csv.DictWriter(csvfile,
-                                    fieldnames=["name", "width", "gap"])
-            writer.writeheader()
-            writer.writerows(rows)
-
-        return csv_path
+    def write_csv_task(self):
+        return tb.node('write_results_to_csv',
+                       results_gap=self.generate_wfs.results_gap)
 
 
 def workflow(runner):
