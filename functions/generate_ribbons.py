@@ -1,5 +1,4 @@
 from ase.build import graphene_nanoribbon
-from ase.visualize import view
 from ase import Atoms
 import numpy as np
 
@@ -173,8 +172,3 @@ def generate_ribbon(N: int, identifier: str, n: int, m: float, vac: float = 5):
     ribbon.center(vac, axis=0)
 
     return ribbon
-
-
-ribbon = generate_ribbon(3, 'S', 1, 1)  # (N, identifier, n, m)
-ribbon = saturate_edges(ribbon)  # (atoms, symbol, bond length)
-view(ribbon)
