@@ -2,3 +2,5 @@ __pycache__/
 convergence_files/
 *.err
 *.out
+backbone_structure/tree/
+backbone_structure/.taskblaster
