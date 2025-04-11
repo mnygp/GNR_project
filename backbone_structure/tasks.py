@@ -13,12 +13,14 @@ from functions.bandstructure import get_gap
 # generating armchair graphene nanoribbons (AGNR) of different widths.
 @tb.dynamical_workflow_generator_task
 def generate_wfs_from_list(input):
-    for i in range(4, input+1):
+    for i in range(2, input+1):
         wf = SubWorkflow(width=i)
         name = f'AGNR_{i}'
         yield name, wf
 
 
+# This is a taskblaster workflow that generates a series of workflows for
+# generating armchair graphene nanoribbons (AGNR) of different widths.
 @tb.workflow
 class SubWorkflow:
     width = tb.var()
@@ -36,7 +38,13 @@ class SubWorkflow:
     def calculate_gap_task(self):
         return tb.node('calculate_gap_task', in_file=self.relax_ribbon_task)
 
+    @tb.task
+    def return_dict_task(self):
+        return tb.node('return_dict', width=self.width,
+                       gap=self.calculate_gap_task)
 
+
+# The functions called in the tasks above are defined here.
 def generate_ribbon(width) -> Path:
     ribbon = graphene_nanoribbon(n=width/2.0, m=2, type='armchair',
                                  vacuum=8.0, saturated=True)
@@ -57,3 +65,7 @@ def calculate_gap_task(in_file: Path) -> float:
     gap = get_gap(ribbon, params={'func': 'PBE', 'PW_cut': 600}, k=6,
                   filename='gap.txt')
     return gap
+
+
+def return_dict(width, gap):
+    return {'width': width, 'gap': gap}
