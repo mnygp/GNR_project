@@ -20,7 +20,8 @@ class Workflow:
         ]
         csv_path = Path("results.csv")
         with open(csv_path, mode="w", newline="") as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=["name", "width", "gap"])
+            writer = csv.DictWriter(csvfile,
+                                    fieldnames=["name", "width", "gap"])
             writer.writeheader()
             writer.writerows(rows)
 
