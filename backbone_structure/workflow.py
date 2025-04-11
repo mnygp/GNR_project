@@ -11,4 +11,4 @@ class Workflow:
 
 
 def workflow(runner):
-    runner.run_workflow(Workflow(max_width=20))
+    runner.run_workflow(Workflow(max_width=8))
