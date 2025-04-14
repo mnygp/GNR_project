@@ -24,7 +24,7 @@ class Workflow:
             "func": "PBE",
             "basis": "dzp"
         }
-        return tb.node('single_LCAO_relax',
+        return tb.node('single_LCAO_relax', filename='calc_out_LCAO.txt',
                        atoms_path=self.generate_ribbon_task, params=params)
 
     @tb.task
@@ -34,7 +34,7 @@ class Workflow:
             "basis_list": ["szp", "szp", "dzp"]
         }
         k_arr = [3, 6, 6]
-        return tb.node('multi_relaxation',
+        return tb.node('multi_relaxation', filename='calc_out_multi.txt',
                        atoms_path=self.generate_ribbon_task,
                        params=params,
                        k_arr=k_arr)

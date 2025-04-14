@@ -7,7 +7,7 @@ from pathlib import Path
 def ribbon_path(N, identifier, n, m):
     ribbon = generate_ribbon(N, identifier, n, m)
     write(f'{N}-AGNR-{identifier}.xyz', ribbon)
-    return Path(f'AGNR_{N}.xyz')
+    return Path(f'{N}-AGNR-{identifier}.xyz')
 
 
 def single_PW_relax(atoms_path, filename: str, params: dict):
