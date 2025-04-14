@@ -10,11 +10,10 @@ def get_gap(ribbon: Atoms, params: RelaxParams, k: int = 4,
     PW_cut = params.get('PW_cut')
     assert PW_cut is not None, "PW_cut is required"
     func = params['func']
-    PW_cut = params.get('PW_cut')
     calc = GPAW(mode=PW(PW_cut),
                 xc=func,
                 kpts={'size': (1, 1, k)},
-                occupations=FermiDirac(0.1),
+                occupations=FermiDirac(0.01),
                 txt=filename)
 
     ribbon.calc = calc
