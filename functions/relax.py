@@ -29,7 +29,6 @@ class RelaxParams(TypedDict):
     func: str
     PW_cut: NotRequired[float]
     basis: NotRequired[str]
-    basis_list: NotRequired[list[str]]
 
 
 def relax(structure: Atoms, filename: str, PW_toggle: bool,
@@ -44,6 +43,9 @@ def relax(structure: Atoms, filename: str, PW_toggle: bool,
                     xc=func,
                     kpts={'size': (1, 1, k)},
                     txt=filename)
+        structure.calc = calc
+        atoms_to_relax = UnitCellFilter(structure)
+
     else:
         basis = params.get('basis')
         assert basis is not None, "basis is required when PW_toggle is False"
@@ -53,14 +55,14 @@ def relax(structure: Atoms, filename: str, PW_toggle: bool,
                     kpts={'size': (1, 1, k)},
                     txt=filename)
 
-    structure.calc = calc
-    uf = UnitCellFilter(structure)
+        structure.calc = calc
+        atoms_to_relax = structure
 
     if traj_name is not None:
-        traject = Trajectory(traj_name+'.traj', 'w', uf)
-        relax = BFGS(uf, trajectory=traject)
+        traject = Trajectory(traj_name+'.traj', 'w', atoms_to_relax)
+        relax = BFGS(atoms_to_relax, trajectory=traject)
     else:
-        relax = BFGS(uf)
+        relax = BFGS(atoms_to_relax)
     relax.run(fmax=0.01)
 
     return structure
