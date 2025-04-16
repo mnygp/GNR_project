@@ -45,14 +45,16 @@ class SubWorkflow:
 
     @tb.task
     def return_dict_task(self):
-        return tb.node('return_dict', width=self.width,
-                       gap=self.calculate_gap)
+        return tb.node('return_dict',
+                       width=self.width,
+                       pre_gap=self.gap_pre_relaxation_task,
+                       post_gap=self.gap_post_relaxation_task)
 
 
 # The functions called in the tasks above are defined here.
 def generate_ribbon(width) -> Path:
     ribbon = graphene_nanoribbon(n=width/2.0, m=2, type='armchair',
-                                 vacuum=8.0, saturated=True)
+                                 vacuum=6.0, saturated=True)
     write(f'AGNR_{width}.xyz', ribbon)
     return Path(f'AGNR_{width}.xyz')
 
