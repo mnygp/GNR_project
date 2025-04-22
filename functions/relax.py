@@ -22,7 +22,6 @@ The parameters dictionary for the relaxation can include:
 - `func`: The exchange-correlation functional to use (e.g., 'PBE').
 - `PW_cut`: The plane-wave cutoff energy (in eV) for the GPAW calculator.
 - `basis`: The basis set to use (e.g., 'dzp')
-- `basis_list`: A list of basis sets to use for multiple relaxation steps.
 """
 
 
@@ -44,6 +43,7 @@ def relax(structure: Atoms, filename: str, PW_toggle: bool,
                     xc=func,
                     kpts={'size': (1, 1, k)},
                     txt=filename)
+
         structure.calc = calc
         atoms_to_relax = UnitCellFilter(structure)
 
@@ -86,7 +86,7 @@ def multi_step_relax(structure: Atoms, filename: str, PW_toggle: bool,
                                                   PW_cut=params['PW_cut'])
         else:
             traj_file_name = trajectory_file_name(traj_name, k,
-                                                  basis=params['basis'])
+                                                  basis=basis_list[i])
 
         if type(params['basis']) is list:
             params['basis'] = basis_list[i]
