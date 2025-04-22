@@ -13,7 +13,7 @@ post = data[order, 3]
 
 plt.plot(width, pre, '-o', label="pre relaxation")
 plt.plot(width, post, '-o', label="post relaxation")
-plt.xlim(1,21)
+plt.xlim(1, 21)
 plt.xticks(np.linspace(2, 20, 10, dtype=int))
 plt.xlabel("Width")
 plt.ylabel("Gap energy [eV]")
