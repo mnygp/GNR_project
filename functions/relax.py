@@ -21,7 +21,8 @@ trajectory based on the provided parameters.
 The parameters dictionary for the relaxation can include:
 - `func`: The exchange-correlation functional to use (e.g., 'PBE').
 - `PW_cut`: The plane-wave cutoff energy (in eV) for the GPAW calculator.
-- `basis`: The basis set to use (e.g., 'dzp')
+- `basis`: The basis set to use (e.g., 'dzp'). Can be a list of basis
+  sets for different k-point meshes.
 """
 
 
