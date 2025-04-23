@@ -86,8 +86,9 @@ def multi_step_relax(structure: Atoms, filename: str, PW_toggle: bool,
             traj_file_name = trajectory_file_name(traj_name, k,
                                                   PW_cut=params['PW_cut'])
         else:
+            basis_name = basis_list[i].split('(')[0]
             traj_file_name = trajectory_file_name(traj_name, k,
-                                                  basis=basis_list[i])
+                                                  basis=basis_name)
 
         if type(params['basis']) is list:
             params['basis'] = basis_list[i]
