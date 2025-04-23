@@ -98,7 +98,8 @@ def saturate_edges(ribbon: Atoms, symbol: str = 'H',
     return ribbon
 
 
-def generate_ribbon(N: int, identifier: str, n: int, m: float, vac: float = 5):
+def generate_ribbon(N: int, identifier: str, n: int, m: float,
+                    vac: float = 5, wrap: bool = True) -> Atoms:
 
     check_parameters(N, identifier, n, m, vac)
     # Bond length
@@ -126,7 +127,7 @@ def generate_ribbon(N: int, identifier: str, n: int, m: float, vac: float = 5):
                 ribbon += C2_edge
 
         elif (N % 2 == 1):
-            length = 2*(n+1) + 2*(m-2)
+            length = 2*n + 2*(m - 1)
             ribbon = graphene_nanoribbon(N/2.0, int(length),
                                          type='armchair', vacuum=vac)
 
@@ -168,7 +169,10 @@ def generate_ribbon(N: int, identifier: str, n: int, m: float, vac: float = 5):
             C2_edge = add_C2(o, ribbon.cell, False)
             ribbon += C2_edge
 
-    ribbon.positions[:, 2] = ribbon.positions[:, 2] % ribbon.cell[2, 2]
+    # Only set False if structure is spliced onto another structure
+    if wrap:
+        ribbon.wrap()
+
     ribbon.center(vac, axis=0)
 
     return ribbon
@@ -176,15 +180,19 @@ def generate_ribbon(N: int, identifier: str, n: int, m: float, vac: float = 5):
 
 def edge_state_ribbon(N: int, identifier: str, n: int, m: float,
                       clean_length: int, repeat: int = 1,
-                      vac: float = 5) -> Atoms:
-    ribbon = generate_ribbon(N, identifier, n, m, vac)
-    ribbon = saturate_edges(ribbon)
-
+                      vac: float = 5, tag: bool = False) -> Atoms:
+    ribbon = generate_ribbon(N, identifier, n, m, vac, wrap=False)
     ribbon = ribbon.repeat((1, 1, repeat))
 
+    # Add tag for LDOS calculations
+    if tag:
+        edge_indices = [i for i, tag in enumerate(ribbon.get_tags())
+                        if tag == 5]
+        edge_max_z = np.argmax(ribbon.positions[edge_indices, 2])
+        ribbon[edge_indices[edge_max_z]].tag = 10
+
     clean_ribbon = graphene_nanoribbon(N/2.0, int(clean_length),
-                                       type='armchair', saturated=True,
-                                       vacuum=vac)
+                                       type='armchair', vacuum=vac)
 
     clean_ribbon.cell[0, 0] = ribbon.cell[0, 0]
     clean_ribbon.center(axis=0)
@@ -195,5 +203,7 @@ def edge_state_ribbon(N: int, identifier: str, n: int, m: float,
 
     ribbon.cell[2, 2] += extra_z
     ribbon += clean_ribbon
+
+    ribbon = saturate_edges(ribbon)
 
     return ribbon
