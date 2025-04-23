@@ -172,3 +172,28 @@ def generate_ribbon(N: int, identifier: str, n: int, m: float, vac: float = 5):
     ribbon.center(vac, axis=0)
 
     return ribbon
+
+
+def edge_state_ribbon(N: int, identifier: str, n: int, m: float,
+                      clean_length: int, repeat: int = 1,
+                      vac: float = 5) -> Atoms:
+    ribbon = generate_ribbon(N, identifier, n, m, vac)
+    ribbon = saturate_edges(ribbon)
+
+    ribbon = ribbon.repeat((1, 1, repeat))
+
+    clean_ribbon = graphene_nanoribbon(N/2.0, int(clean_length),
+                                       type='armchair', saturated=True,
+                                       vacuum=vac)
+
+    clean_ribbon.cell[0, 0] = ribbon.cell[0, 0]
+    clean_ribbon.center(axis=0)
+
+    z_shift = ribbon.cell[2, 2]
+    extra_z = clean_ribbon.cell[2, 2]
+    clean_ribbon.positions[:, 2] += z_shift
+
+    ribbon.cell[2, 2] += extra_z
+    ribbon += clean_ribbon
+
+    return ribbon
