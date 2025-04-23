@@ -78,9 +78,9 @@ def return_dict(width, pre_gap, post_gap) -> dict:
     return {'width': width, 'pre_gap': pre_gap, 'post_gap': post_gap}
 
 
-def write_results_to_csv(results) -> Path:
+def write_results_to_csv(results_dict) -> Path:
     rows = []
-    for name, d in results.items():
+    for name, d in results_dict.items():
         width = d['width']
         pre_gap = d['pre_gap']
         post_gap = d['post_gap']
