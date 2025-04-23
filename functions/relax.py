@@ -28,7 +28,7 @@ The parameters dictionary for the relaxation can include:
 class RelaxParams(TypedDict):
     func: str
     PW_cut: NotRequired[float]
-    basis: NotRequired[str]
+    basis: NotRequired[str | list[str]]
 
 
 def relax(structure: Atoms, filename: str, PW_toggle: bool,
