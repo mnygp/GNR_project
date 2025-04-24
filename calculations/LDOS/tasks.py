@@ -4,6 +4,7 @@ from functions.bandstructure import LDOS
 from ase.io import read, write
 from pathlib import Path
 import taskblaster as tb
+import numpy as np
 
 
 @tb.dynamical_workflow_generator_task
@@ -20,7 +21,7 @@ class SubWorkflow:
 
     @tb.task
     def generate_ribbon_task(self):
-        return tb.node('generate_ribbon', width=self.repeat)
+        return tb.node('generate_ribbon', repeat=self.repeat)
 
     @tb.task
     def ldos_pre_relaxation_task(self):
@@ -31,7 +32,7 @@ class SubWorkflow:
     @tb.task
     def multi_relaxation_task(self):
         params = {"func": "PBE", "basis": ["szp(dzp)", "szp(dzp)", "dzp"]}
-        k_arr = [3, 6, 6]
+        k_arr = [1, 3, 6]
         return tb.node('multi_relaxation',
                        filename='calc_out_multi.txt',
                        atoms_path=self.generate_ribbon_task,
@@ -43,13 +44,14 @@ class SubWorkflow:
         return tb.node('LDOS_task', atoms_path=self.multi_relaxation_task)
 
 
-def ribbon_path(N: int, identifier: str, n: int, m: float | int,
-                repeat: int = 1) -> Path:
+def generate_ribbon(repeat) -> Path:
+    n = 1
+    m = 1
     length = 2*n + 2*(m - 1)
-    ribbon = edge_state_ribbon(N, n, m, clean_length=length*repeat,
+    ribbon = edge_state_ribbon(7, 'S', n, m, clean_length=length*repeat,
                                repeat=repeat, vac=5, tag=True)
-    write(f'{N}-AGNR-{identifier}.xyz', ribbon)
-    return Path(f'{N}-AGNR-{identifier}.xyz')
+    write(f'7-AGNR-repeat_{repeat}.xyz', ribbon)
+    return Path(f'7-AGNR-repeat_{repeat}.xyz')
 
 
 def multi_relaxation(atoms_path: Path, filename: str,
@@ -65,6 +67,7 @@ def multi_relaxation(atoms_path: Path, filename: str,
 
 def LDOS_task(atoms_path: Path, params: dict):
     atoms = read(atoms_path)
-    site_index = atoms.tags.index(10)
+    tags = atoms.get_tags()
+    site_index = np.where(tags == 10)[0]
     energies, ldos = LDOS(atoms, params, site_index)
     return {'energies': energies, 'ldos': ldos}

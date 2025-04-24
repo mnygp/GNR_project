@@ -15,4 +15,4 @@ class Workflow:
 
 
 def workflow(runner):
-    runner.run_workflow(Workflow(max_repeat=7))
+    runner.run_workflow(Workflow(max_repeat=5))

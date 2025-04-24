@@ -181,6 +181,7 @@ def generate_ribbon(N: int, identifier: str, n: int, m: float,
 def edge_state_ribbon(N: int, identifier: str, n: int, m: float,
                       clean_length: int, repeat: int = 1,
                       vac: float = 5, tag: bool = False) -> Atoms:
+
     ribbon = generate_ribbon(N, identifier, n, m, vac, wrap=False)
     ribbon = ribbon.repeat((1, 1, repeat))
 
