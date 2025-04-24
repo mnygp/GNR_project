@@ -2,5 +2,5 @@ __pycache__/
 convergence_files/
 *.err
 *.out
-*/tree/
-*/.taskblaster
+**/tree/
+**/.taskblaster
