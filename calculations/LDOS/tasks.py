@@ -5,6 +5,7 @@ from ase.io import read, write
 from pathlib import Path
 import taskblaster as tb
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 @tb.dynamical_workflow_generator_task
@@ -25,9 +26,16 @@ class SubWorkflow:
 
     @tb.task
     def ldos_pre_relaxation_task(self):
-        ldos_params = {"func": "PBE", "PW_cut": 600}
-        return tb.node('LDOS_task', atoms_path=self.generate_ribbon_task,
+        ldos_params = {"func": "PBE", "basis": 'dzp'}
+        return tb.node('LDOS_func', atoms_path=self.generate_ribbon_task,
                        params=ldos_params)
+
+    @tb.task
+    def plot_ldos_pre_relax_task(self):
+        return tb.node('plot_ldos',
+                       energies=self.ldos_pre_relaxation_task['energies'],
+                       ldos=self.ldos_pre_relaxation_task['ldos'],
+                       repeat=self.repeat)
 
     @tb.task
     def multi_relaxation_task(self):
@@ -41,7 +49,16 @@ class SubWorkflow:
 
     @tb.task
     def ldos_post_relaxation_task(self):
-        return tb.node('LDOS_task', atoms_path=self.multi_relaxation_task)
+        ldos_params = {"func": "PBE", "basis": 'dzp'}
+        return tb.node('LDOS_func', atoms_path=self.multi_relaxation_task,
+                       params=ldos_params)
+
+    @tb.task
+    def plot_ldos_post_relax_task(self):
+        return tb.node('plot_ldos',
+                       energies=self.ldos_post_relaxation_task['energies'],
+                       ldos=self.ldos_post_relaxation_task['ldos'],
+                       repeat=self.repeat)
 
 
 def generate_ribbon(repeat) -> Path:
@@ -65,9 +82,20 @@ def multi_relaxation(atoms_path: Path, filename: str,
     return Path('relaxed_ribbon_LCAO_multi_step.xyz')
 
 
-def LDOS_task(atoms_path: Path, params: dict):
+def LDOS_func(atoms_path: Path, params: dict):
     atoms = read(atoms_path)
     tags = atoms.get_tags()
     site_index = np.where(tags == 10)[0]
-    energies, ldos = LDOS(atoms, params, site_index)
-    return {'energies': energies, 'ldos': ldos}
+    energies, ldos = LDOS(atoms, params, site_index, npoints=800)
+    return {'energies': energies.tolist(), 'ldos': ldos.tolist()}
+
+
+def plot_ldos(energies, ldos, repeat):
+    plt.figure()
+    plt.plot(energies, ldos)
+    plt.title(f'LDOS for {repeat} repetitions')
+    plt.xlabel('Energy [eV]')
+    plt.xlim(-2, 2)
+    plt.grid()
+    plt.savefig(f'ldos_repeat_{repeat}.png', dpi=500)
+    plt.close()
