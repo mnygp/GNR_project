@@ -1,6 +1,5 @@
 from ase.optimize.bfgs import BFGS
 from ase.filters import UnitCellFilter
-from ase.constraints import StrainFilter
 from ase.io import Trajectory
 from ase import Atoms
 
@@ -112,15 +111,3 @@ def trajectory_file_name(traj_name: str | None, k: int,
         traj_file_name = None
 
     return traj_file_name
-
-
-def optimize_cell_along_z(atoms: Atoms) -> Atoms:
-    assert atoms.calc is not None, "Atoms object has no calculator assigned."
-    assert isinstance(atoms.calc, GPAW), "Calculator is not a GPAW instance."
-    assert atoms.calc.mode.name == 'lcao', "Calculator mode is not LCAO."
-
-    sf = StrainFilter(atoms, mask=(0, 0, 1))  # relax cell only along z
-    opt = BFGS(sf)
-    opt.run(fmax=0.01)
-
-    return atoms

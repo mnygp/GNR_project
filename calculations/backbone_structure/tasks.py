@@ -69,7 +69,7 @@ def relax_ribbon(in_file: Path, out_file: str) -> Path:
 
 def calculate_gap(in_file: Path) -> float:
     ribbon = read(in_file)
-    gap = get_gap(ribbon, params={'func': 'PBE', 'PW_cut': 600}, k=6,
+    gap = get_gap(ribbon, params={'func': 'PBE', 'PW_cut': 600}, k=30,
                   filename='gap.txt')
     return gap
 
