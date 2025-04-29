@@ -43,8 +43,10 @@ def LDOS(ribbon: Atoms, calc_params: RelaxParams, site_index: int,
 
     ribbon.get_potential_energy()
 
+    ef = ribbon.calc.get_fermi_level()
+
     energies, ldos = calc.get_lcao_dos(atom_indices=site_index,
                                        npts=npoints,
-                                       width=0.1)
+                                       width=0.02)
 
-    return energies, ldos
+    return energies - ef, ldos
