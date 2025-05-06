@@ -4,3 +4,6 @@ convergence_files/
 *.out
 **/tree/
 **/.taskblaster
+**/*.egg-info
+calculations/backbone_structure/bandstructure/*.xyz
+calculations/backbone_structure/bandstructure/bandstructure_*.png
