@@ -86,7 +86,7 @@ def LDOS_func(atoms_path: Path, params: dict):
     atoms = read(atoms_path)
     tags = atoms.get_tags()
     site_index = np.where(tags == 10)[0]
-    energies, ldos = LDOS(atoms, params, site_index, npoints=800)
+    energies, ldos = LDOS(atoms, params, site_index, npoints=1200, k=24)
     return {'energies': energies.tolist(), 'ldos': ldos.tolist()}
 
 
@@ -95,7 +95,7 @@ def plot_ldos(energies, ldos, repeat):
     plt.plot(energies, ldos)
     plt.title(f'LDOS for {repeat} repetitions')
     plt.xlabel('Energy [eV]')
-    plt.xlim(-2, 2)
+    plt.xlim(-3, 3)
     plt.grid()
     plt.savefig(f'ldos_repeat_{repeat}.png', dpi=500)
     plt.close()
