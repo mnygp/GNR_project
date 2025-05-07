@@ -24,9 +24,9 @@ w2, pre2, post2 = width[2::3], pre[2::3], post[2::3]
 fig, ax = plt.subplots(figsize=(5, 2.5))
 
 ax.plot(width, post, '-o', color='black')
-ax.plot(w0, post0, '-o', color='blue')
-ax.plot(w1, post1, '-o', color='red')
-ax.plot(w2, post2, '-o', color='green')
+ax.plot(w0, post0, 'o', color='blue')
+ax.plot(w1, post1, 'o', color='red')
+ax.plot(w2, post2, 'o', color='green')
 ax.set_xlim(1, 21)
 ax.set_ylim(bottom=0)
 ax.set_xticks(np.linspace(2, 20, 10, dtype=int))
