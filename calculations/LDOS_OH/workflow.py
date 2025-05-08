@@ -31,7 +31,7 @@ class Workflow:
     @tb.task
     def ldos_edge_state_task(self):
         return tb.node('LDOS_func',
-                       atoms_path=self.gs_ribbon_task,
+                       gpaw_path=self.gs_ribbon_task,
                        tag_number=10)
 
     @tb.task
@@ -46,7 +46,7 @@ class Workflow:
     @tb.task
     def ldos_clean_state_task(self):
         return tb.node('LDOS_func',
-                       atoms_path=self.gs_ribbon_task,
+                       gpaw_path=self.gs_ribbon_task,
                        tag_number=20)
 
     @tb.task
@@ -61,7 +61,7 @@ class Workflow:
     @tb.task
     def ldos_serated_state_task(self):
         return tb.node('LDOS_func',
-                       atoms_path=self.gs_ribbon_task,
+                       gpaw_path=self.gs_ribbon_task,
                        tag_number=30)
 
     @tb.task
@@ -89,7 +89,7 @@ class Workflow:
     @tb.task
     def ldos_OH_pre_relax_task(self):
         return tb.node('LDOS_func',
-                       atoms_path=self.gs_OH_task,
+                       gpaw_path=self.gs_OH_task,
                        tag_number=10)
 
     @tb.task
@@ -114,7 +114,7 @@ class Workflow:
     @tb.task
     def ldos_OH_post_relax_task(self):
         return tb.node('LDOS_func',
-                       atoms_path=self.relax_task,
+                       gpaw_path=self.relax_task,
                        tag_number=10)
 
     @tb.task

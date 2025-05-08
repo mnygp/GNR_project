@@ -109,7 +109,7 @@ def insert_OH(atoms_path: Path) -> Path:
     O_pos = atoms.get_positions()[closest_H_index]
 
     new_H_pos = np.array([O_pos[0] + np.sin(np.pi/6)*OH_bond,
-                          O_pos[1],
+                          O_pos[1] + 0.3,
                           O_pos[2] + np.cos(np.pi/6)*OH_bond])
 
     atoms += Atoms('H', positions=[new_H_pos])
