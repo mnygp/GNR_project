@@ -1,6 +1,7 @@
 from ase import Atoms
 from gpaw import GPAW, PW, FermiDirac
 from functions.relax import RelaxParams
+from pathlib import Path
 
 
 # For now it only uses PW mode to calculate the gap
@@ -44,6 +45,18 @@ def LDOS(ribbon: Atoms, calc_params: RelaxParams, site_index: int,
     ribbon.get_potential_energy()
 
     ef = ribbon.calc.get_fermi_level()
+
+    energies, ldos = calc.get_lcao_dos(atom_indices=site_index,
+                                       npts=npoints,
+                                       width=0.02)
+
+    return energies - ef, ldos
+
+
+def LDOS_from_file(filename: Path, site_index: int, npoints: int = 301):
+
+    calc = GPAW(filename)
+    ef = calc.get_fermi_level()
 
     energies, ldos = calc.get_lcao_dos(atom_indices=site_index,
                                        npts=npoints,
