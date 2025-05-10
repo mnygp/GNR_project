@@ -60,6 +60,13 @@ class SubWorkflow:
                        n=self.n,
                        m=self.m)
 
+    @tb.task
+    def write_csv_task(self):
+        return tb.node('write_csv',
+                       n=self.n,
+                       m=self.m,
+                       data_dict=self.ldos_edge_state_task)
+
 
 def generate_ribbon(repeat, n, m) -> Path:
     length = 2*n + 2*(m - 1)
@@ -121,6 +128,15 @@ def LDOS_func(gpaw_path: Path, tag_number: int) -> dict:
     site_index = np.where(tags == tag_number)[0]
     energies, ldos = LDOS_from_file(gpaw_path, site_index, 1200)
     return {'energies': energies.tolist(), 'ldos': ldos.tolist()}
+
+
+def write_csv(n: int, m: int, data_dict: dict[str, list[float]]):
+    energies = data_dict['energies']
+    ldos = data_dict['ldos']
+    data = np.column_stack((energies, ldos))
+    filename = f'ldos_n_{int(n)}_m_{int(m)}.csv'
+    np.savetxt(filename, data, delimiter=',', header="energies,ldos")
+    return Path(filename)
 
 
 def plot_ldos(energies, ldos, n, m):
