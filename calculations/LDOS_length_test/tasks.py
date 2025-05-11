@@ -7,6 +7,9 @@ import taskblaster as tb
 import numpy as np
 import matplotlib.pyplot as plt
 
+import scienceplots  # noqa: F401
+plt.style.use('science')
+
 
 @tb.dynamical_workflow_generator_task
 def generate_wfs_from_list(input):
@@ -35,7 +38,8 @@ class SubWorkflow:
         return tb.node('plot_ldos',
                        energies=self.ldos_pre_relaxation_task['energies'],
                        ldos=self.ldos_pre_relaxation_task['ldos'],
-                       repeat=self.repeat)
+                       repeat=self.repeat,
+                       relaxation=False)
 
     @tb.task
     def multi_relaxation_task(self):
@@ -58,7 +62,8 @@ class SubWorkflow:
         return tb.node('plot_ldos',
                        energies=self.ldos_post_relaxation_task['energies'],
                        ldos=self.ldos_post_relaxation_task['ldos'],
-                       repeat=self.repeat)
+                       repeat=self.repeat,
+                       relaxation=True)
 
 
 def generate_ribbon(repeat) -> Path:
@@ -90,12 +95,19 @@ def LDOS_func(atoms_path: Path, params: dict):
     return {'energies': energies.tolist(), 'ldos': ldos.tolist()}
 
 
-def plot_ldos(energies, ldos, repeat):
+def plot_ldos(energies, ldos, repeat, relaxation: bool):
+    if relaxation:
+        text = f'{repeat} repetitions \n Post relaxation'
+    else:
+        text = f'{repeat} repetitions \n Pre relaxation'
+
     plt.figure()
     plt.plot(energies, ldos)
-    plt.title(f'LDOS for {repeat} repetitions')
+    plt.text(0.03, 0.97, text,
+             ha='left', va='top', transform=plt.gca().transAxes)
     plt.xlabel('Energy [eV]')
+    plt.ylabel('LDOS')
     plt.xlim(-3, 3)
-    plt.grid()
+    plt.tight_layout()
     plt.savefig(f'ldos_repeat_{repeat}.png', dpi=500)
     plt.close()
