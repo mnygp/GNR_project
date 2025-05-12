@@ -1,6 +1,5 @@
 from functions.generate_ribbons import edge_state_ribbon
-from functions.bandstructure import LDOS_from_file
-from functions.relax import multi_step_relax
+from functions.bandstructure import LDOS_from_file, LDOS
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,6 +10,9 @@ from ase.io import read, write
 from ase import Atoms
 
 from gpaw import GPAW, PW, FermiDirac, restart
+
+import scienceplots  # noqa: F401
+plt.style.use('science')
 
 
 def generate_ribbon(repeat, n, m) -> Path:
@@ -50,20 +52,20 @@ def tag_atoms(atoms_path: Path, m: int) -> Path:
 
 
 def gs_calculation(atoms_path: Path, params: dict,
-                   file_name: str, k: int = 6) -> Path:
+                   file_name: str) -> Path:
 
     atoms = read(atoms_path)
     if params.get('PW_cut') is not None:
         atoms.calc = GPAW(mode=PW(params.get('PW_cut')),
                           xc=params['func'],
-                          kpts={'size': (1, 1, k)},
+                          kpts={'size': (1, 1, 1)},
                           occupations=FermiDirac(0.01),
                           txt=file_name)
     else:
         atoms.calc = GPAW(mode='lcao',
                           basis=params['basis'],
                           xc=params['func'],
-                          kpts={'size': (1, 1, k)},
+                          kpts={'size': (1, 1, 1)},
                           occupations=FermiDirac(0.01),
                           txt=file_name)
 
@@ -74,30 +76,29 @@ def gs_calculation(atoms_path: Path, params: dict,
 
 def LDOS_func(gpaw_path: Path, tag_number: int) -> dict:
     atoms, calc = restart(gpaw_path)
+    ef = calc.get_fermi_level()
+    print(f'Fermi energy {ef}')
     tags = atoms.get_tags()
     site_index = np.where(tags == tag_number)[0]
     energies, ldos = LDOS_from_file(gpaw_path, site_index, npoints=1200)
     return {'energies': energies.tolist(), 'ldos': ldos.tolist()}
 
 
-def multi_relaxation(atoms_path: Path, filename: str,
-                     params: dict, k_arr: list[int]):
+def gs_and_LDOS(atoms_path: Path, tag_number: int):
     atoms = read(atoms_path)
-
-    relaxed_ribbon = multi_step_relax(atoms, filename, PW_toggle=False,
-                                      params=params, k_arr=k_arr,
-                                      traj_name='relax_LCAO_multi_step')
-    relaxed_ribbon.calc.write('7-AGNR-relaxed.gpw', mode='all')
-    return Path('7-AGNR-relaxed.gpw')
+    ldos_params = {'basis': 'szp(dzp)', 'func': 'PBE'}
+    energies, ldos = LDOS(atoms, ldos_params, tag_number, k=1, npoints=1200)
+    return {'energies': energies.tolist(), 'ldos': ldos.tolist()}
 
 
 def insert_OH(atoms_path: Path) -> Path:
     OH_bond = 0.96
-    # CO_bond = 1.43
+    CO_bond = 1.43
     atoms = read(atoms_path)
     symbols = atoms.get_chemical_symbols()
     site_index = np.where(atoms.get_tags() == 10)[0]
 
+    # Add the oxygen atom
     H_atom_indices = [i for i, s in enumerate(symbols) if s == 'H']
     H_atom_distances = [np.linalg.norm(atoms.get_positions()[i]
                                        - atoms.get_positions()[site_index])
@@ -105,9 +106,15 @@ def insert_OH(atoms_path: Path) -> Path:
     closest_H_index = H_atom_indices[np.argmin(H_atom_distances)]
     atoms[closest_H_index].symbol = 'O'
     atoms[closest_H_index].tag = 40
+    O_index = closest_H_index
 
-    O_pos = atoms.get_positions()[closest_H_index]
+    # Move it to the correct distance
+    direction = atoms.positions[O_index] - atoms.positions[site_index]
+    new_direction = direction/np.linalg.norm(direction)*CO_bond
+    atoms.positions[O_index] = atoms.positions[site_index] + new_direction
 
+    O_pos = atoms.get_positions()[O_index]
+    # The *0.95 is to compensate that it get moved up a bit
     new_H_pos = np.array([O_pos[0] + np.sin(np.pi/6)*OH_bond,
                           O_pos[1] + 0.3,
                           O_pos[2] + np.cos(np.pi/6)*OH_bond])
@@ -118,14 +125,14 @@ def insert_OH(atoms_path: Path) -> Path:
     return Path('7-AGNR-OH.xyz')
 
 
-def plot_ldos(energies, ldos, title: str, file_name: str):
+def plot_ldos(energies, ldos, title: str, filename: str):
     plt.figure()
     plt.plot(energies, ldos)
     plt.title(title)
     plt.xlabel('Energy [eV]')
     plt.xlim(-3, 3)
+    plt.ylim(0, 1.8)
     plt.ylabel('LDOS')
-    plt.grid()
     plt.tight_layout()
-    plt.savefig(file_name, dpi=500)
+    plt.savefig(filename, dpi=500)
     plt.close()

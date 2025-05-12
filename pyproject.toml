@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "GNR-project"
 description = "A description of the GNR project"  # Optional: Add a project description
-version = "0.1"
+version = "1.0"
 readme = "README.md"
 
 dependencies = [

@@ -62,4 +62,8 @@ def LDOS_from_file(filename: Path, site_index: int, npoints: int = 301):
                                        npts=npoints,
                                        width=0.02)
 
+    from ase.parallel import parprint
+    parprint(f'Energy range: {min(energies)} to {max(energies)}')
+    parprint(f'Fermi level: {ef}')
+
     return energies - ef, ldos
